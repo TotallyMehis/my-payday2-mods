@@ -1,8 +1,13 @@
 local unlock_app_ids = {
-	--1347750, -- Breakfast in Tijuana Heist
-	--1252200, -- San Martin Bank Heist
-	--1184411, -- Border Crossing Heist
-	--1449450, -- Buluc's Mansion Heist
+	1347750, -- Breakfast in Tijuana Heist
+	1252200, -- San Martin Bank Heist
+	1184411, -- Border Crossing Heist
+	1449450, -- Buluc's Mansion Heist
+	1555040, -- Dragon Pack
+	1654480, -- The Ukrainian Prisoner Heist
+	1778790, -- Black Cat Heist
+	1906240, -- Mountain Master Heist
+	1945681, -- Midland Ranch Heist
 }
 
 local function print_dlcs(onlynonverified)
