@@ -8,75 +8,40 @@ local unlock_app_ids = {
 	1778790, -- Black Cat Heist
 	1906240, -- Mountain Master Heist
 	1945681, -- Midland Ranch Heist
+	2074240, -- Lost in Transit Heist
+	2215010, -- Hostile Takeover Heist
+	2353512, -- Crude Awakening Heist
 }
 
-local function print_dlcs(onlynonverified)
-	local t = {}
-
-	-- Collect the DLCs.
-	for dlc_name, dlc_data in pairs(Global.dlc_manager.all_dlc_data) do
-		local do_print = false
-		
-		if onlynonverified then
-			if not dlc_data.verified then
-				do_print = true
-			end
-		else
-			do_print = true
-		end
-		
-		-- Some DLC may not have an app id.
-		if do_print and dlc_data.app_id then
-			local num = tonumber(dlc_data.app_id)
-		
-			table.insert(t, { name = dlc_name, app_id = num })
+local function unlock_dlc(dlc_data)
+	if dlc_data.app_id == nil then
+		return false
+	end
+	local dlc_app_id = tonumber(dlc_data.app_id)
+	for index, app_id in pairs(unlock_app_ids) do
+		if dlc_app_id == app_id then
+			log(string.format("Unlocking %d", app_id))
+			return true
 		end
 	end
-	
-	-- Sort by app id
-	table.sort(t, function(i, j)
-		return i.app_id > j.app_id
-	end )
-	
 
-	log( "-----------------")
-	if onlynonverified then
-		log("Not owned DlCs: ")
+	return false
+end
+
+local _win_check_dlc_data = WINDLCManager._check_dlc_data
+function WINDLCManager:_check_dlc_data(dlc_data)
+	if unlock_dlc(dlc_data) then
+		return true
 	else
-		log("All DLCs: ")
-	end
-	log("-----------------")
-	
-	for k, v in pairs(t) do
-		log(string.format("%s | %d", v.name, v.app_id))
-	end
-	
-	log("-----------------")
-end
-
-local function unlock_dlcs()
-	for dlc_name, dlc_data in pairs(Global.dlc_manager.all_dlc_data) do
-		if dlc_data.app_id then
-			local num = tonumber(dlc_data.app_id)
-			
-			for k, app_id in pairs(unlock_app_ids) do
-				if app_id == num then
-					dlc_data.verified = true
-					log(string.format("Unlocked %s (%d)", dlc_name, app_id))
-				end
-			end
-		end
+		return _win_check_dlc_data(self, dlc_data)
 	end
 end
 
-
-Hooks:PostHook(WINDLCManager, "_verify_dlcs", "MyHookVerifyDLCs", function(self)
-	if not Global or not Global.dlc_manager or not Global.dlc_manager.all_dlc_data then
-		log("dlc_manager or dlc_manager.all_dlc_data does not exist!")
-		return
+local _steam_check_dlc_data = WinSteamDLCManager._check_dlc_data
+function WinSteamDLCManager:_check_dlc_data(dlc_data)
+	if unlock_dlc(dlc_data) then
+		return true
+	else
+		return _steam_check_dlc_data(self, dlc_data)
 	end
-	
-	unlock_dlcs()
-	print_dlcs(true)
-end)
-
+end
